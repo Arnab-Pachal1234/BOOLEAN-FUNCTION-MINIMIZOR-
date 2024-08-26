@@ -1,0 +1,1 @@
+This is a Boolean function minimizer where quine mcclusky concept is used and pi chart implemented

@@ -1,10 +1,10 @@
 class Row:
     def __init__(self, row, value):
-        self.row= row
+        self.row_number= row
         self.value = value
 
     def __repr__(self):
-              return f"Row(row_number={self.row}, value={self.value})"
+              return f"Row(row_number={self.row_number}, value={self.value})"
     
 
 def solve(chart, newchart, rows):
@@ -12,17 +12,19 @@ def solve(chart, newchart, rows):
     key_set = set(chart.keys())
     
     while len(key_set) > 0:
-       
+        if not rows:
+            break  # Exit the loop if rows is empty to avoid IndexError
+        
         rows.sort(key=lambda row: row.value, reverse=True)
-       
-        ans.append(rows[0].row)
         
-    
+        ans.append(rows[0].row_number)
+        
         for i in range(rows[0].value):
-            key_set.discard(newchart[rows[0].row][i])
-            del chart[newchart[rows[0].row][i]]
+            minterm = newchart[rows[0].row_number][i]
+            if minterm in chart:  # Check if the key exists before deletion
+                key_set.discard(minterm)
+                del chart[minterm]
         
-     
         nowchart = {}
         for j in chart:
             for k in chart[j]:
@@ -30,13 +32,14 @@ def solve(chart, newchart, rows):
                     nowchart[k].append(j)
                 else:
                     nowchart[k] = [j]
-        newchart = nowchart
         
+        newchart = nowchart
+        chart = row_dominance(chart)
+        chart = column_dominance(chart)
        
         rows = [Row(i, len(newchart[i])) for i in newchart]
     
-    return ans    
-    
+    return ans
 
 def refine(my_list,dc_list): # Removes don't care terms from a given list and returns refined list
     res = []
@@ -303,9 +306,9 @@ for i in all_pi:
 EPI = findEPI(chart)
 
 print("\nEssential Prime Implicants: "+', '.join(str(i) for i in EPI))
+print("\n \n \n \n")
 
-chart = row_dominance(chart)
-chart = column_dominance(chart)
+
 
 removeTerms(chart,EPI) 
 if len(chart)!=0:
@@ -318,7 +321,8 @@ if len(chart)!=0:
                 newchart[j]=[i]    
     
       rows =[Row(i,len(newchart[i])) for i in newchart]
-      print(len(rows))
+      chart = row_dominance(chart)
+      chart= row_dominance(chart)
       EPI = solve(chart,newchart,rows)
 
 
